@@ -1,0 +1,43 @@
+gitignore
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ===== Виртуальное окружение =====
+venv/
+env/
+ENV/
+.venv/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===== Данные приложения (НЕ коммитим!) =====
+*.db
+*.sqlite
+*.sqlite3
+backups/
+*.log
+
+# ===== PyInstaller =====
+*.spec
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Экспортированные отчёты =====
+*.xlsx
+*.pdf
+!requirements.txt
