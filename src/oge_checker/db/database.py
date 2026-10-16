@@ -17,18 +17,10 @@ def get_engine():
     return _engine
 
 def init_db() -> None:
-    from . import models
+    """Создать все таблицы, если их нет."""
+    from . import models  # noqa: F401
     Base.metadata.create_all(bind=_engine)
 
 def get_session() -> Session:
     return SessionLocal()
 
-if __name__ == "__main__":
-    print("Engine:", get_engine())
-    print("DB path:", get_db_path())
-    
-    init_db()
-    print("init_db() выполнен")
-    
-    with get_session() as session:
-        print("Session:", session)
