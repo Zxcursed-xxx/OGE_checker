@@ -1,31 +1,41 @@
-"""Скрипт для проверки содержимого БД."""
+"""Скрипт проверки содержимого БД.
+
+"""
 
 import sqlite3
+import sys
 from pathlib import Path
 
-# Путь к БД
-db_path = Path.home() / "AppData" / "Roaming" / "OGE_Checker" / "oge_checker.db"
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
-print(f"Путь к БД: {db_path}")
-print(f"Файл существует: {db_path.exists()}")
+from src.oge_checker.utils.paths import get_db_path
 
-if not db_path.exists():
-    print("❌ Файл БД не найден!")
-    exit(1)
 
-conn = sqlite3.connect(str(db_path))
-cur = conn.cursor()
+def main() -> None:
+    db_path = get_db_path()
+    print(f"Путь к БД: {db_path}")
+    print(f"Файл существует: {db_path.exists()}")
 
-# Список таблиц
-cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
-tables = cur.fetchall()
-print(f"\nТаблицы в БД: {tables}")
+    if not db_path.exists():
+        print("❌ Файл БД не найден!")
+        return
 
-# Структура таблицы users (если есть)
-if ("users",) in tables:
-    print("\nСтруктура таблицы users:")
-    cur.execute("PRAGMA table_info(users)")
-    for row in cur.fetchall():
-        print(f"  {row}")
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
 
-conn.close()
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    tables = cur.fetchall()
+    print(f"\nТаблицы в БД: {tables}")
+
+    for table_name, in tables:
+        print(f"\nСтруктура таблицы {table_name}:")
+        cur.execute(f"PRAGMA table_info({table_name})")
+        for row in cur.fetchall():
+            print(f"  {row}")
+
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
