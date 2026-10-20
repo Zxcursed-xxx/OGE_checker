@@ -10,7 +10,7 @@ from .database import Base
 
 
 class User(Base):
-    """Пользователь: администратор или учитель или ученик"""
+    """Пользователь: администратор или учитель"""
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -27,7 +27,7 @@ class User(Base):
     classes: Mapped[list["Class"]] = relationship(back_populates="teacher")
 
 class Class(Base):
-    """Класс(9А)"""
+    """Класс (9А)"""
     __tablename__ = "classes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -36,3 +36,16 @@ class Class(Base):
     teacher_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     
     teacher: Mapped["User"] = relationship(back_populates="classes")
+
+    students: Mapped[list["Student"]] = relationship(back_populates="class_")
+
+class Student(Base):
+    """Ученик"""
+    __tablename__ = "students"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    full_name: Mapped[str] = mapped_column(String(100))
+    class_id: Mapped[int] = mapped_column(ForeignKey("classes.id"))
+
+    class_: Mapped["Class"] = relationship(back_populates="students")
+
