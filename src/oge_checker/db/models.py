@@ -3,7 +3,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -48,4 +48,19 @@ class Student(Base):
     class_id: Mapped[int] = mapped_column(ForeignKey("classes.id"))
 
     class_: Mapped["Class"] = relationship(back_populates="students")
+
+class Scale(Base):
+    """Оценки и баллы"""
+    __tablename__ = "scales"
+    __table_args__ = (
+        UniqueConstraint("subject", "year", name="uq_scales_subject_year"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    subject: Mapped[str] = mapped_column(String(50))
+    year: Mapped[int] = mapped_column(default=2026)
+    max_score: Mapped[int]
+    grade2_max: Mapped[int]
+    grade3_max: Mapped[int]
+    grade4_max: Mapped[int]
 
