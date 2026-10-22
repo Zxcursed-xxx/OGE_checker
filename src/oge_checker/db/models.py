@@ -25,6 +25,7 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     
     classes: Mapped[list["Class"]] = relationship(back_populates="teacher")
+    checks: Mapped[list["Check"]] = relationship(back_populates="teacher")
 
 class Class(Base):
     """Класс (9А)"""
@@ -38,6 +39,7 @@ class Class(Base):
     teacher: Mapped["User"] = relationship(back_populates="classes")
 
     students: Mapped[list["Student"]] = relationship(back_populates="class_")
+    checks: Mapped[list["Check"]] = relationship(back_populates="class_")
 
 class Student(Base):
     """Ученик"""
@@ -48,6 +50,7 @@ class Student(Base):
     class_id: Mapped[int] = mapped_column(ForeignKey("classes.id"))
 
     class_: Mapped["Class"] = relationship(back_populates="students")
+    results: Mapped[list["Result"]] = relationship(back_populates="student")
 
 class Scale(Base):
     """Оценки и баллы"""
@@ -63,4 +66,41 @@ class Scale(Base):
     grade2_max: Mapped[int]
     grade3_max: Mapped[int]
     grade4_max: Mapped[int]
+
+class Check(Base):
+    """Проверки"""
+    __tablename__ = "checks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    class_id: Mapped[int] = mapped_column(ForeignKey("classes.id"))
+    teacher_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    subject: Mapped[str] = mapped_column(String(50))
+    work_name: Mapped[str] = mapped_column(String(67))
+    date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    max_score: Mapped[int]
+    tasks_count: Mapped[int]
+    status: Mapped[str] = mapped_column(String(20), default="draft")
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+    class_: Mapped["Class"] = relationship(back_populates="checks")
+    teacher: Mapped["User"] = relationship(back_populates="checks")
+    results: Mapped[list["Result"]] = relationship(back_populates="check")
+
+class Result(Base):
+    """результат ученика за проверку"""
+    __tablename__ = "results"
+    __table_args__ = (
+        UniqueConstraint("check_id", "student_id", name="uq_results_check_student"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    check_id: Mapped[int] = mapped_column(ForeignKey("checks.id"))
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"))
+    total_score: Mapped[int]
+    grade: Mapped[int]
+    scores: Mapped[str] = mapped_column(String(500))
+    is_absent: Mapped[bool] = mapped_column(default=False)
+
+    check: Mapped["Check"] = relationship(back_populates="results")
+    student: Mapped["Student"] = relationship(back_populates="results")
 
